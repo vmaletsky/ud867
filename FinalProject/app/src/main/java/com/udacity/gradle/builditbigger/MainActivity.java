@@ -1,19 +1,25 @@
 package com.udacity.gradle.builditbigger;
 
-import android.os.Bundle;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ProgressBar;
 
+import com.example.vmaletskiy.jokedisplay.JokeActivity;
 
 public class MainActivity extends ActionBarActivity {
-
+    ProgressBar mProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mProgressBar.setVisibility(View.GONE);
     }
 
 
@@ -39,9 +45,21 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void tellJoke(View view) {
-        Toast.makeText(this, "derp", Toast.LENGTH_SHORT).show();
-    }
+    public void onClick(View view) {
 
+        mProgressBar.setVisibility(View.VISIBLE);
+        EndpointsAsyncTask task = new EndpointsAsyncTask(
+                new OnAsyncTaskCompleted() {
+                    @Override
+                    public void onCompleted(String joke) {
+                        Intent intent = new Intent(MainActivity.this, JokeActivity.class);
+                        intent.putExtra(getString(R.string.joke_extra), joke);
+                        mProgressBar.setVisibility(View.GONE);
+                        startActivity(intent);
+                    }
+                }
+        );
+        task.execute();
+    }
 
 }
